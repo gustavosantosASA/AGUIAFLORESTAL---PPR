@@ -1,6 +1,7 @@
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
+import gspread
+import streamlit as st
+from oauth2client.service_account import ServiceAccountCredentials
 
 def get_google_sheet_by_url(url):
     """Conecta ao Google Sheets usando a URL e retorna a planilha"""
