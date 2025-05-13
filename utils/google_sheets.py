@@ -32,20 +32,20 @@ def get_worksheet(url, worksheet_name):
             return None
     return None
 
-def read_sheet_to_dataframe(spreadsheet_url, worksheet_name):
-    scope = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
-    creds = ServiceAccountCredentials.from_json_keyfile_name('credentials/service_account.json', scope)
-    client = gspread.authorize(creds)
-    sheet = client.open_by_url(spreadsheet_url)
-    worksheet = sheet.worksheet(worksheet_name)
 
-    data = worksheet.get_all_values()
-    if not data:
-        return pd.DataFrame()
-    
-    headers = data[0]
-    rows = data[1:]
-    return pd.DataFrame(rows, columns=headers)
+def read_sheet_to_dataframe(sheet_url, worksheet_name):
+    import json
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+
+    # Carrega as credenciais a partir dos secrets do Streamlit
+    creds_dict = dict(st.secrets["google_sheets"])
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
+
+    client = gspread.authorize(creds)
+    sheet = client.open_by_url(sheet_url)
+    worksheet = sheet.worksheet(worksheet_name)
+    data = worksheet.get_all_records()
+    return pd.DataFrame(data)
 
 
 def write_dataframe_to_sheet(url, worksheet_name, dataframe):
