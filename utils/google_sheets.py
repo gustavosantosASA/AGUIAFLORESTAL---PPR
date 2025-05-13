@@ -34,17 +34,14 @@ def get_worksheet(url, worksheet_name):
     return None
 
 
-def read_sheet_to_dataframe(sheet_url, worksheet_name):
-    import json
+def read_sheet_to_dataframe(spreadsheet_url, worksheet_name):
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-
-    # Carrega as credenciais a partir dos secrets do Streamlit
     creds_dict = dict(st.secrets["google_sheets"])
-    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
-
-    client = gspread.authorize(creds)
-    sheet = client.open_by_url(sheet_url)
-    worksheet = sheet.worksheet(worksheet_name)
+    creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
+    gc = gspread.authorize(creds)
+    
+    spreadsheet = gc.open_by_url(spreadsheet_url)
+    worksheet = spreadsheet.worksheet(worksheet_name)
     data = worksheet.get_all_records()
     return pd.DataFrame(data)
 
